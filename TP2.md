@@ -16,6 +16,8 @@ La commande permet de vérifier la configuration réseau de la machine Windows, 
 ### Étape 2
 Description de l'étape + capture d'écran
 
+Un scan réseau est effectué a l'aide de Nmap depuis la machine Windows 11 afin d'identifier les ports TCP ouverts sur le serveur Ubuntu. Cette analyse permet de découvrir les services accessibles a distance et de déterminer les possibilités d'investigation.
+
 ### Étape 3
 Description de l'étape + capture d'écran
 
