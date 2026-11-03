@@ -10,6 +10,9 @@ Voici les étapes détaillées pour pouvoir modifier le courriel / téléphone s
 ### Étape 1
 Description de l'étape + capture d'écran
 
+Cette partie consiste à réaliser une attaque à distance contre le serveur Web Ubuntu à partir de la machine Windows 11. Le but est de modifier les coordonnées affichées sur la page « Contact » du site Web, sans accéder directement à la machine Linux. Commande utilisée: ipconfig 
+La commande permet de vérifier la configuration réseau de la machine Windows, son address IPv4, son masque de sous-réseau et sa passerelle par défaut.
+
 ### Étape 2
 Description de l'étape + capture d'écran
 
