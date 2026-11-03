@@ -1,7 +1,7 @@
 # TP2 Cybersécurité
-- Nom: (votre prénom et nom)
-- Matricule: (votre matricule)
-- Groupe: (votre numéro de groupe)
+- Nom: (Aedan Ravet Smith)
+- Matricule: (2475600)
+- Groupe: (1020)
 
 ## Attaque (exploit)
 
