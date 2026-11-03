@@ -26,6 +26,8 @@ Description de l'étape + capture d'écran
 
 Une analyse supplémentaire est effectuée afin de vérifier l'état des ports 22 et 80 du serveur Ubuntu. Cette étape permet de déterminer si le service SSH est accessible à distance et de confirmer la disponibilité du service HTTP.
 
+Le scan Nmap indique que le port TCP 22 est ouvert et qu'il héberge le service SSH. Le port 80 est également accessible pour le service HTTP. Une connexion SSH a ensuite été tentée avec le compte bob, mais l'authentification a été refusée avec le message « Access denied ».
+
 ### ....
 
 ## Correctif 1
