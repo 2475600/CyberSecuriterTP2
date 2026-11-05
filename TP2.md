@@ -110,7 +110,7 @@ Résultat :
 
 Connexion réussie avec le compte bob grâce au mot de passe compromis.
 
-Capture d'écran :
+Capture d me d'écran :
 
 ![Connexion SSH réussie avec le mot de passe compromis](./Capture4.png)
 
@@ -250,6 +250,8 @@ Capture d'écran :
 
 ![Vérification du blocage du port SSH par pare-feu](./Capture7.png)
 
+
+
 Impact sur les fonctionnalités :
 
 L'accès SSH à distance est bloqué. Cela empêche l'administration du serveur par SSH depuis le réseau, mais le site Web demeure accessible par HTTP.
@@ -268,4 +270,148 @@ Commandes à effectuer sur Ubuntu avec le compte DaBoss :
 
 Attribuer la propriété des fichiers à root :
 
-sudo ch
+sudo chown -R root:root /var/www/html
+
+Définir les permissions des répertoires :
+
+sudo find /var/www/html -type d -exec chmod 755 {} \;
+
+Définir les permissions des fichiers :
+
+sudo find /var/www/html -type f -exec chmod 644 {} \;
+
+Vérifier les permissions :
+
+ls -l /var/www/html/
+
+Explication :
+
+La commande chown attribue la propriété des fichiers à l'administrateur root.
+
+La permission 755 permet aux utilisateurs de consulter les répertoires et de les parcourir, mais seuls les propriétaires peuvent les modifier.
+
+La permission 644 permet aux utilisateurs de lire les fichiers HTML, mais seul le propriétaire peut les modifier.
+
+Ainsi, Bob peut toujours consulter le site Web, mais il ne peut plus modifier les fichiers qui le composent.
+
+Étape de l'exploit bloquée :
+
+Ce correctif bloque les étapes 5 et 6, car le compte Bob ne possède plus les permissions d'écriture nécessaires pour modifier contact.html.
+
+Vérification de l'exploit :
+
+Vérifier les permissions du fichier :
+
+ls -l /var/www/html/contact.html
+
+Tester ensuite les droits d'écriture avec le compte Bob :
+
+sudo -u bob test -w /var/www/html/contact.html
+echo $?
+
+Le résultat attendu est 1, ce qui signifie que Bob ne possède pas les droits d'écriture sur le fichier.
+
+Le site Web doit toutefois demeurer accessible depuis Windows 11 à l'adresse :
+
+http://192.168.0.15/contact.html
+
+
+
+Impact sur les fonctionnalités :
+
+Les utilisateurs peuvent toujours consulter le site Web normalement. Cependant, les utilisateurs ordinaires ne peuvent plus modifier directement les fichiers HTML. Les modifications doivent être effectuées par un administrateur autorisé.
+
+
+
+Correctif 3 – Sécuriser les mots de passe et l'authentification SSH
+
+Objectif :
+
+Le troisième correctif consiste à empêcher l'utilisation d'un mot de passe compromis pour accéder au serveur.
+
+Un mot de passe qui a été exposé dans une fuite de données ne doit plus être accepted. De plus, l'authentification SSH par mot de passe peut être désactivée afin de privilégier l'utilisation de clés cryptographiques.
+
+Commandes à effectuer sur Ubuntu avec le compte DaBoss :
+
+Changer le mot de passe du compte Bob :
+
+sudo passwd bob
+
+Choisir un nouveau mot de passe fort, unique et différent de celui qui a été compromis.
+
+Créer un fichier de configuration SSH :
+
+sudo nano /etc/ssh/sshd_config.d/99-hardening.conf
+
+Ajouter les paramètres suivants :
+
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+
+Enregistrer le fichier et vérifier la configuration SSH :
+
+sudo sshd -t
+
+Si aucune erreur n'est affichée, recharger le service SSH :
+
+sudo systemctl reload ssh
+
+Vérifier les paramètres appliqués :
+
+sudo sshd -T | grep -E 'passwordauthentication|kbdinteractiveauthentication'
+
+Explication :
+
+La commande passwd permet de remplacer le mot de passe compromis du compte Bob.
+
+La configuration SSH désactive l'authentification par mot de passe et par clavier interactif.
+
+Les connexions SSH doivent donc utiliser une méthode d'authentification plus sécurisée, comme une clé SSH autorisée.
+
+Étape de l'exploit bloquée :
+
+Ce correctif bloque l'étape 4, car le mot de passe compromis ne peut plus être utilisé pour ouvrir une session SSH par authentification avec mot de passe.
+
+Vérification de l'exploit :
+
+Depuis Windows 11, tenter une nouvelle connexion :
+
+ssh bob@192.168.0.15
+
+Le résultat attendu est que l'authentification par mot de passe soit refusée.
+
+Il est également possible de vérifier les paramètres SSH sur Ubuntu avec :
+
+sudo sshd -T | grep passwordauthentication
+
+Le résultat attendu est :
+
+passwordauthentication no
+
+Vérifier ensuite que le site Web est toujours accessible :
+
+http://192.168.0.15/contact.html
+
+
+
+Impact sur les fonctionnalités :
+
+L'authentification SSH par mot de passe n'est plus disponible. Les administrateurs doivent utiliser des clés SSH pour se connecter à distance. Le service HTTP et l'accès au site Web restent fonctionnels.
+
+
+
+Conclusion
+
+Ce travail m'a permis de comprendre comment un serveur Web peut être vulnérable lorsque des services réseau sont accessibles, que des identifiants sont compromis et que les permissions des fichiers ne sont pas correctement configurées.
+
+L'utilisation de Nmap a permis de découvrir les services accessibles sur le serveur Ubuntu. L'analyse des informations disponibles sur Bob Smith a ensuite permis d'identifier un risque lié à la réutilisation d'un mot de passe compromis.
+
+Les trois correctifs proposés permettent de renforcer la sécurité du serveur de différentes façons :
+
+Le pare-feu limite les accès réseau non autorisés.
+
+Les permissions des fichiers empêchent les utilisateurs ordinaires de modifier le site Web.
+
+La sécurisation des mots de passe et de SSH empêche l'utilisation d'identifiants compromis.
+
+Ces mesures permettent de réduire les risques d'intrusion tout en conservant le fonctionnement du site Web.
